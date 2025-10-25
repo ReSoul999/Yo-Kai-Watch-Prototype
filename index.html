@@ -69,7 +69,6 @@
     text-align: center;
   }
 
-  /* Contenedor de botones más abajo */
   #buttonsContainer {
     position: absolute;
     bottom: 15%;
@@ -108,19 +107,11 @@
 </head>
 <body>
 
-<!-- Pantalla de inicio -->
 <div id="startScreen">Presiona para comenzar</div>
-
-<!-- Créditos -->
 <div id="credits">Game made by GSacoco Team</div>
-
-<!-- Video de Level-5 -->
-<video id="introVideo" src="level5.mp4"></video>
-
-<!-- Fundido -->
+<video id="introVideo" src="level5.mp4" playsinline></video>
 <div id="fade"></div>
 
-<!-- Menú -->
 <div id="menu">
   <div id="buttonsContainer">
     <button class="menu-btn" id="startBtn">Start</button>
@@ -129,7 +120,6 @@
   <audio id="menuMusic" src="musica_menu.mp3" loop></audio>
 </div>
 
-<!-- Pantalla de salida -->
 <div id="exitScreen">Saliendo...</div>
 
 <script>
@@ -141,7 +131,7 @@ const music = document.getElementById("menuMusic");
 const fade = document.getElementById("fade");
 const exitScreen = document.getElementById("exitScreen");
 
-// Entrar en pantalla completa
+// Entrar en fullscreen (compatible iOS)
 function requestFullscreenMode() {
   const element = document.documentElement;
   if (element.requestFullscreen) element.requestFullscreen();
@@ -149,7 +139,7 @@ function requestFullscreenMode() {
   else if (element.msRequestFullscreen) element.msRequestFullscreen();
 }
 
-// Secuencia completa tras presionar
+// Secuencia tras tocar pantalla inicial
 startScreen.addEventListener("click", () => {
   requestFullscreenMode();
   startScreen.style.display = "none";
@@ -158,7 +148,7 @@ startScreen.addEventListener("click", () => {
   setTimeout(() => { credits.style.opacity = 1; }, 200);
   setTimeout(() => { credits.style.opacity = 0; }, 3500);
 
-  // Mostrar video
+  // Video con sonido
   setTimeout(() => {
     credits.style.display = "none";
     video.style.display = "block";
@@ -166,7 +156,7 @@ startScreen.addEventListener("click", () => {
   }, 5000);
 });
 
-// Al acabar el video → mostrar menú
+// Al terminar el video → mostrar menú
 video.addEventListener("ended", () => {
   fade.style.opacity = 1;
   setTimeout(() => {
