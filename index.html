@@ -102,6 +102,20 @@
     font-size: 3em;
     color: white;
     z-index: 10;
+    opacity: 0;
+    transition: opacity 1.5s;
+  }
+
+  /* Botón play para iOS si autoplay falla */
+  #playButton {
+    display: none;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    color: white;
+    cursor: pointer;
+    z-index: 20;
   }
 </style>
 </head>
@@ -109,7 +123,9 @@
 
 <div id="startScreen">Presiona para comenzar</div>
 <div id="credits">Game made by GSacoco Team</div>
-<video id="introVideo" src="level5.mp4" playsinline></video>
+
+<video id="introVideo" src="level5.mp4" playsinline webkit-playsinline></video>
+
 <div id="fade"></div>
 
 <div id="menu">
@@ -121,6 +137,7 @@
 </div>
 
 <div id="exitScreen">Saliendo...</div>
+<div id="playButton">Toca para reproducir video</div>
 
 <script>
 const startScreen = document.getElementById("startScreen");
@@ -130,30 +147,41 @@ const menu = document.getElementById("menu");
 const music = document.getElementById("menuMusic");
 const fade = document.getElementById("fade");
 const exitScreen = document.getElementById("exitScreen");
+const playButton = document.getElementById("playButton");
 
-// Entrar en fullscreen (compatible iOS)
+// Fullscreen
 function requestFullscreenMode() {
-  const element = document.documentElement;
-  if (element.requestFullscreen) element.requestFullscreen();
-  else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
-  else if (element.msRequestFullscreen) element.msRequestFullscreen();
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
 }
 
-// Secuencia tras tocar pantalla inicial
+// Secuencia tras el toque inicial
 startScreen.addEventListener("click", () => {
-  requestFullscreenMode();
   startScreen.style.display = "none";
+  requestFullscreenMode();
 
   // Créditos
-  setTimeout(() => { credits.style.opacity = 1; }, 200);
+  credits.style.opacity = 1;
   setTimeout(() => { credits.style.opacity = 0; }, 3500);
 
-  // Video con sonido
+  // Mostrar video
   setTimeout(() => {
     credits.style.display = "none";
     video.style.display = "block";
-    video.play().catch(e => console.log("Autoplay bloqueado:", e));
+
+    // Intentar reproducir video y música
+    video.play().catch(() => { playButton.style.display = "block"; });
+    music.play().catch(() => console.log("Autoplay música bloqueado"));
   }, 5000);
+});
+
+// Botón iOS si autoplay falla
+playButton.addEventListener("click", () => {
+  video.play();
+  music.play();
+  playButton.style.display = "none";
 });
 
 // Al terminar el video → mostrar menú
@@ -163,11 +191,10 @@ video.addEventListener("ended", () => {
     video.style.display = "none";
     menu.style.display = "block";
     fade.style.opacity = 0;
-    music.play().catch(e => console.log("Autoplay música bloqueado:", e));
   }, 1500);
 });
 
-// Botón Start
+// Start
 document.getElementById("startBtn").addEventListener("click", () => {
   fade.style.opacity = 1;
   setTimeout(() => {
@@ -178,15 +205,13 @@ document.getElementById("startBtn").addEventListener("click", () => {
   }, 1500);
 });
 
-// Botón Quit
+// Quit
 document.getElementById("quitBtn").addEventListener("click", () => {
   fade.style.opacity = 1;
   setTimeout(() => {
     menu.style.display = "none";
     fade.style.opacity = 0;
     exitScreen.style.display = "block";
-    exitScreen.style.opacity = 0;
-    exitScreen.style.transition = "opacity 1.5s";
     requestAnimationFrame(() => { exitScreen.style.opacity = 1; });
 
     setTimeout(() => {
